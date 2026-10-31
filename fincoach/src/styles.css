@@ -114,3 +114,12 @@ label{display:block;font-size:.85rem;color:var(--soft)}label em,form>em,.goalfor
 .brand-text{display:flex;flex-direction:column;line-height:1.15;min-width:0}
 .brand-name{font-size:1.35rem;font-weight:800;letter-spacing:-.02em}
 .brand-tag{font-size:11px;font-weight:400;color:var(--soft);letter-spacing:.01em;margin-top:2px}
+/* News */
+.chip.on{background:var(--accent);color:#F6EBDA;border-color:var(--accent)}
+.newsrow{padding:14px 0;border-top:1px solid var(--line)}.newsrow:first-child{border-top:0;padding-top:0}
+.newsrow p{margin:6px 0 0;color:var(--soft);font-size:.9rem}
+.newstitle{display:inline-flex;gap:6px;align-items:baseline;margin-top:6px;font-weight:600;color:var(--ink);text-decoration:none}.newstitle:hover{text-decoration:underline}
+.tag{font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid var(--line);background:var(--card2);color:var(--soft)}
+.tag.rbi,.tag.sebi{background:var(--accent);border-color:var(--accent);color:#F6EBDA}
+.newswarn{border-left:6px solid #9b3b2e;padding:12px 16px}
+.spin{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
