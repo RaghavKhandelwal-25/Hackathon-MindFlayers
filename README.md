@@ -1,156 +1,166 @@
-# Finbot — AI-Powered Financial Education & Management Platform
+# Finbot — AI-Powered Financial Education Platform
 
-Finbot is a personal finance web application that helps users understand their money, build better budgeting habits, plan financial goals, explore hypothetical investment growth, follow official financial-sector updates, and learn to identify online scams.
+<p align="center">
+  <strong>Make smarter financial decisions.</strong><br/>
+  An AI-powered personal finance companion for budgeting, goal planning, investment simulations, expense tracking, financial news, and scam awareness.
+</p>
 
-It combines a React frontend with a FastAPI backend. Its AI financial coach uses a **hybrid retrieval-augmented generation (RAG) pipeline**: it retrieves relevant information from local financial-education PDFs and trusted official Indian sources such as the Reserve Bank of India (RBI), Securities and Exchange Board of India (SEBI), and National Centre for Financial Education (NCFE). Financial calculations are handled by backend calculation logic rather than being left to the language model.
-
-> **Disclaimer:** Finbot is an educational platform. It does not provide personalized regulated investment advice, guarantee returns, or recommend specific securities to buy or sell. Investment projections are hypothetical; actual returns may differ and investments involve risk.
+<p align="center">
+  <a href="https://hackathon-mind-flayers.vercel.app/">Live Application</a>
+  &nbsp;•&nbsp;
+  <a href="https://finbot-backend-iqgn.onrender.com/">Backend API</a>
+  &nbsp;•&nbsp;
+  <a href="https://finbot-backend-iqgn.onrender.com/docs">API Documentation</a>
+</p>
 
 ---
 
-## Contents
+## Overview
 
-- [Features](#features)
-- [Application Sections](#application-sections)
-- [Technology Stack](#technology-stack)
-- [How the AI Coach Works](#how-the-ai-coach-works)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Environment Configuration](#environment-configuration)
-- [API Reference](#api-reference)
-- [Data and Privacy](#data-and-privacy)
-- [Running Tests](#running-tests)
-- [Deployment Notes](#deployment-notes)
-- [Disclaimer](#disclaimer)
+**Finbot** is a full-stack financial education and money-management application designed to make personal finance easier to understand and act on. Users can create a financial profile, review their budget, track expenses, plan savings goals, simulate potential SIP growth, read updates from official Indian financial institutions, and learn to identify common financial scams.
+
+The application combines a React frontend with a Python FastAPI backend. Its AI Financial Coach uses a hybrid Retrieval-Augmented Generation (RAG) pipeline to ground educational answers in local financial-education PDFs and trusted official sources, including the Reserve Bank of India (RBI), Securities and Exchange Board of India (SEBI), and National Centre for Financial Education (NCFE).
+
+Financial projections and budget calculations are handled by deterministic backend logic. The language model is used to explain financial concepts and synthesize retrieved evidence; it is not treated as a calculator or a source of guaranteed investment outcomes.
+
+## Live Deployment
+
+| Component | URL | Hosting |
+|---|---|---|
+| Frontend | [hackathon-mind-flayers.vercel.app](https://hackathon-mind-flayers.vercel.app/) | Vercel |
+| Backend | [finbot-backend-iqgn.onrender.com](https://finbot-backend-iqgn.onrender.com/) | Render |
+| Backend API docs | [OpenAPI / Swagger UI](https://finbot-backend-iqgn.onrender.com/docs) | FastAPI |
+
+The frontend communicates with the backend through the deployed API base URL:
+
+```text
+https://finbot-backend-iqgn.onrender.com/api
+```
+
+> **Deployment configuration:** The deployment notes supplied for this release identify `VITE_API_URL` as the Vercel environment variable. The repository snapshot inspected for this README has `frontend/src/services/api.js` reading `VITE_API_BASE_URL`. Vite environment variable names must match the name read by the frontend source exactly. Confirm the current `api.js` in the version being deployed and use that same key in Vercel; otherwise the frontend may fall back to `http://localhost:8000/api`. After changing a Vercel environment variable, trigger a new deployment because Vite embeds environment values at build time.
 
 ---
 
 ## Features
 
-| Feature | Description |
+| Section | What it does |
 |---|---|
-| AI Financial Coach | Ask financial questions and receive educational answers grounded in financial PDFs and trusted official sources, with citations where available. |
-| Financial Profile | Save and edit basic profile details, income, investment budget, expenses, experience level, preferences, and financial goals. |
-| Dashboard | View income, investment budget, planned expenses, investment percentage, budget analysis, and the AI chat interface. |
-| Budget Analysis | Review income, recorded expenses, goal commitments, remaining balance, and potential monthly deficit using deterministic calculations. |
-| Goal Planning | Create, edit, and delete goals; calculate the required contribution and view projected progress. |
-| SIP Simulator | Explore hypothetical SIP growth using monthly contributions, duration, and expected annual return. Compare pessimistic, expected, and optimistic scenarios and optionally check a target amount. |
-| Expense Tracking | Add and remove expenses, filter by month, and view totals and category-wise spending summaries. |
-| RBI & SEBI News | Read updates from official RBI and SEBI RSS feeds, filter by source, and request a refresh. |
-| Scam or Legit Game | Learn to recognize common financial scams through interactive scenario cards. |
-| Privacy Controls | Hide displayed financial amounts and clear saved profile data, with an option to clear goals and logged expenses as well. |
-
----
-
-## Application Sections
-
-Finbot currently includes the following navigation sections:
-
-1. **Home** — Introduction to Finbot, profile setup entry point, and a quick overview of how the application works.
-2. **Dashboard** — Financial summary cards, monthly budget analysis, and the AI Financial Coach.
-3. **Set Goals** — Create and manage financial goals, generate savings plans, and view goal progress visualizations.
-4. **Simulator** — Run a “what if” SIP simulation and compare estimated outcomes under different return assumptions.
-5. **Expenses** — Record transactions and inspect monthly and category-wise spending.
-6. **News** — Browse RBI and SEBI updates from their official feeds.
-7. **Play** — Practice identifying suspicious and legitimate financial scenarios in the Scam or Legit game.
-
----
+| **Home** | Introduces Finbot and guides new users to set up a financial profile, open the dashboard, or try the scam-awareness game. |
+| **Dashboard** | Shows key financial summaries, monthly budget analysis, deficit alerts, and the AI Financial Coach. |
+| **Financial Profile** | Stores profile details such as income, investment budget, fixed and variable expenses, experience level, preferences, and goals. |
+| **AI Financial Coach** | Answers financial education questions using retrieved evidence from local PDFs and trusted official online sources. |
+| **Set Goals** | Creates, edits, and deletes financial goals; calculates savings requirements and displays progress projections. |
+| **SIP Simulator** | Models hypothetical monthly SIP contributions over a selected period and compares pessimistic, expected, and optimistic return assumptions. |
+| **Expenses** | Records expenses, filters transactions by month, and displays total and category-wise spending. |
+| **RBI & SEBI News** | Fetches and displays updates from official RBI and SEBI feeds, with source filtering and refresh support. |
+| **Scam or Legit** | Presents interactive financial scenarios to help users practice recognizing suspicious activity and common scams. |
+| **Privacy controls** | Lets users hide displayed amounts and clear stored profile data, with an option to clear goals and expenses as well. |
 
 ## Technology Stack
 
-| Layer | Technologies |
-|---|---|
-| Frontend | React 18, Vite, JavaScript |
-| Styling & UI | CSS, Lucide React |
-| Routing | React Router |
-| Charts | Recharts |
-| Markdown rendering | React Markdown, remark-gfm |
-| Backend | Python, FastAPI, Uvicorn |
-| AI model API | Groq |
-| Embeddings | Sentence Transformers |
-| Vector search | FAISS CPU |
-| PDF processing | PyMuPDF |
-| Database | SQLite |
-| News retrieval | Official RBI and SEBI RSS feeds, HTTPX |
-| Configuration | python-dotenv |
+### Frontend
+
+- React 18
+- Vite
+- JavaScript
+- React Router
+- CSS
+- Lucide React
+- Recharts
+- React Markdown and remark-gfm
+- Fetch API
+
+### Backend and AI
+
+- Python
+- FastAPI
+- Uvicorn
+- Groq API for LLM inference
+- Sentence Transformers for text embeddings
+- FAISS CPU for vector similarity search
+- PyMuPDF for PDF text extraction
+- HTTPX for trusted-source retrieval and RSS requests
+- SQLite for profile, goal, and expense persistence
+- python-dotenv for environment configuration
 
 ---
 
-## How the AI Coach Works
+## How the AI Financial Coach Works
 
-Finbot's chatbot is designed around evidence-grounded financial education rather than unrestricted, unsupported answers.
+Finbot uses a hybrid RAG architecture to produce evidence-grounded financial education responses.
 
-1. **Question understanding** — The backend examines the user's question, identifies its intent, and can break complex questions into focused sub-queries.
-2. **Local document retrieval** — Relevant passages are retrieved from indexed financial-education PDFs using Sentence Transformers embeddings and FAISS similarity search.
-3. **Official-source retrieval** — The system can retrieve relevant material from an allowlist of official RBI, SEBI, and NCFE websites. Cached official knowledge can be used when a live fetch is unavailable.
-4. **Evidence combination** — Retrieved passages are ranked and combined so that different parts of a multi-part question can be addressed.
-5. **Answer generation** — The Groq-hosted language model generates a response using the retrieved evidence and the user's supplied financial context when relevant.
-6. **Source attribution** — The API returns source information for local PDF passages and official web passages. Answers can identify document pages or link to official sources.
+1. **Question routing** — The backend identifies the type and intent of the user's question, including greetings, follow-ups, factual questions, comparisons, and requests that require additional guardrails.
+2. **Query understanding** — More complex questions can be decomposed into focused sub-queries so that individual parts of the question are covered.
+3. **Local PDF retrieval** — Financial-education PDFs are extracted, chunked, embedded with Sentence Transformers, and indexed in FAISS. Relevant passages are retrieved for the user's question.
+4. **Official-source retrieval** — The backend retrieves relevant information from trusted RBI, SEBI, and NCFE sources. It uses cached official knowledge when live retrieval is unavailable.
+5. **Evidence ranking and fusion** — Candidate passages from different queries and sources are combined and ranked to improve coverage and relevance.
+6. **Answer synthesis** — The retrieved evidence is passed to the configured Groq model to generate a clear, beginner-friendly explanation.
+7. **Citations and evidence status** — The API can return citations to PDF documents and official web sources, along with evidence and retrieval status.
 
-The backend also includes guardrails for unsupported questions and personalized investment-advice requests. When the available evidence is insufficient, the assistant is designed to say so rather than invent financial facts.
+### Knowledge base
 
-### Knowledge sources
+The backend includes financial-education PDFs under `backend/data/pdfs/`, including material covering:
 
-- Local financial-education PDFs stored in `backend/data/pdfs/`
-- Official RBI resources and publications
-- Official SEBI investor-education resources
-- NCFE financial-literacy resources
+- General financial education
+- Securities markets
+- Investing fundamentals
+- Personal finance and budgeting
+- Retirement and tax-advantaged accounts
 
-The live retrieval layer restricts online source retrieval to configured trusted official domains.
+The online retrieval component is designed around trusted official domains rather than unrestricted web search.
 
 ---
 
-## Architecture
+## Application Architecture
 
 ```text
-                  ┌──────────────────────────┐
-                  │       React + Vite       │
-                  │       Frontend           │
-                  │                          │
-                  │ Home • Dashboard • Goals │
-                  │ Simulator • Expenses     │
-                  │ News • Scam or Legit      │
-                  └────────────┬─────────────┘
-                               │ HTTP / JSON
-                               ▼
-                  ┌──────────────────────────┐
-                  │       FastAPI API        │
-                  │                          │
-                  │ Profile • Dashboard      │
-                  │ Chat • Goals • Simulator │
-                  │ Expenses • News • Game   │
-                  └───────┬──────────┬───────┘
-                          │          │
-              ┌───────────▼───┐  ┌───▼────────────────┐
-              │ SQLite        │  │ Financial Logic    │
-              │ Profile       │  │ Budget analysis    │
-              │ Goals         │  │ Goal planning      │
-              │ Expenses      │  │ SIP calculations   │
-              └───────────────┘  └────────────────────┘
+┌─────────────────────────────────────────────────────┐
+│                  React + Vite                       │
+│                                                     │
+│ Home | Dashboard | Goals | Simulator | Expenses     │
+│ News | Scam or Legit                                │
+│                                                     │
+│ Profile / Shared Finance Context / API Services     │
+└────────────────────────┬────────────────────────────┘
+                         │ HTTPS / JSON
+                         ▼
+┌─────────────────────────────────────────────────────┐
+│                    FastAPI                           │
+│                                                     │
+│ Profile | Dashboard | Budget | Goals | SIP          │
+│ Expenses | News | Game | AI Chat                    │
+└─────────────┬──────────────────────────┬────────────┘
+              │                          │
+              ▼                          ▼
+┌────────────────────────┐   ┌─────────────────────────┐
+│ SQLite persistence     │   │ Financial calculations  │
+│ Profile                │   │ Budget analysis         │
+│ Goals                  │   │ Goal savings plan       │
+│ Expenses               │   │ SIP projections         │
+└────────────────────────┘   └─────────────────────────┘
 
-                          Chat request
-                               │
-                               ▼
-                  ┌──────────────────────────┐
-                  │       RAG Pipeline       │
-                  │ Query understanding      │
-                  │ Retrieval and ranking    │
-                  │ Evidence-aware synthesis │
-                  └───────┬──────────┬───────┘
-                          │          │
-                ┌─────────▼───┐  ┌───▼────────────────┐
-                │ Local PDFs  │  │ Official web data  │
-                │ PyMuPDF     │  │ RBI • SEBI • NCFE  │
-                │ Embeddings  │  │ Retrieval + cache  │
-                │ FAISS       │  └────────────────────┘
-                └─────────────┘
-                          │
-                          ▼
-                  ┌──────────────────────────┐
-                  │       Groq API            │
-                  │ Evidence-grounded answer │
-                  └──────────────────────────┘
+                         AI Chat
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────┐
+│                    Hybrid RAG                        │
+│                                                     │
+│ Query Router → Query Understanding → Retrieval      │
+│                                                     │
+│   ┌────────────────────┐  ┌───────────────────────┐  │
+│   │ Local PDF corpus   │  │ Official-source data  │  │
+│   │ PyMuPDF            │  │ RBI / SEBI / NCFE     │  │
+│   │ SentenceTransform. │  │ Live retrieval/cache  │  │
+│   │ FAISS               │  │                       │  │
+│   └──────────┬─────────┘  └───────────┬───────────┘  │
+│              └────────────┬───────────┘              │
+│                           ▼                          │
+│                 Evidence fusion & ranking           │
+│                           ▼                          │
+│                  Groq LLM response                   │
+│                           ▼                          │
+│                Answer with source data               │
+└─────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -162,19 +172,20 @@ Hackathon-MindFlayers-main/
 │
 ├── backend/
 │   ├── api.py                       # FastAPI application and REST endpoints
-│   ├── rag.py                       # RAG pipeline and answer generation
+│   ├── app.py                       # Streamlit/standalone backend interface
+│   ├── rag.py                       # Hybrid RAG pipeline and answer generation
 │   ├── ingest.py                    # PDF ingestion and FAISS index creation
-│   ├── query_router.py              # Query intent routing
+│   ├── query_router.py              # Query intent classification and routing
 │   ├── query_understanding.py       # Query analysis and decomposition
 │   ├── web_retriever.py             # Trusted official-source retrieval
-│   ├── storage.py                   # SQLite persistence and data operations
-│   ├── finance_calculators.py       # Financial and SIP calculations
+│   ├── storage.py                   # SQLite persistence
+│   ├── finance_calculators.py       # Budget, goal, and SIP calculations
 │   ├── calc_and_profile_handler.py  # Profile and calculation support
-│   ├── news_service.py              # RBI and SEBI RSS feed service
-│   ├── game_cards.py                # Scam or Legit game scenarios
-│   ├── game_service.py              # Game-round generation
+│   ├── news_service.py              # RBI and SEBI news feeds
+│   ├── game_cards.py                # Scam-awareness scenarios
+│   ├── game_service.py              # Game-round service
 │   ├── data/
-│   │   ├── pdfs/                    # Financial education source documents
+│   │   ├── pdfs/                    # Financial education PDFs
 │   │   └── web_cache/               # Cached official-source knowledge
 │   ├── requirements.txt
 │   ├── .env.example
@@ -182,18 +193,19 @@ Hackathon-MindFlayers-main/
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── components/              # Profile, spending and clear-data UI
-│   │   ├── context/                 # Shared finance/profile state
+│   │   ├── components/              # Reusable UI components
+│   │   ├── context/                 # Shared financial/profile state
 │   │   ├── layouts/                 # Shared application layout
 │   │   ├── pages/                   # Home, Dashboard, Goals, etc.
-│   │   ├── services/                # Frontend API service modules
+│   │   ├── services/                # API service modules
 │   │   ├── App.jsx                  # Application routes
 │   │   ├── main.jsx                 # React entry point
-│   │   └── styles.css               # Global styling
+│   │   └── styles.css               # Global styles
 │   ├── public/
 │   ├── package.json
-│   ├── vite.config.js
-│   └── .env.example
+│   ├── .env.example
+│   ├── vercel.json
+│   └── vite.config.js
 │
 ├── docs/
 │   └── GAME.md
@@ -206,18 +218,16 @@ Hackathon-MindFlayers-main/
 
 ---
 
-## Getting Started
+## Run Finbot Locally
 
 ### Prerequisites
 
-Install the following before running Finbot:
+- Python 3.11 or 3.12 recommended
+- Node.js and npm
+- Groq API key
+- Internet connection for installing dependencies, initializing the embedding model, and retrieving official-source updates
 
-- **Python 3.11 or 3.12** (recommended)
-- **Node.js** and npm
-- A **Groq API key** for AI-generated chatbot responses
-- Internet access for installing dependencies, building the PDF index, and retrieving live official-source updates
-
-Get a Groq API key from [Groq Console](https://console.groq.com/keys).
+Create a Groq API key at [Groq Console](https://console.groq.com/keys).
 
 ### 1. Clone the repository
 
@@ -226,76 +236,81 @@ git clone <your-repository-url>
 cd Hackathon-MindFlayers-main
 ```
 
-### 2. Set up the backend
+### 2. Configure and start the backend
 
 ```bash
 cd backend
 python -m venv .venv
 ```
 
-Activate the virtual environment:
+Activate the environment.
 
 **Windows PowerShell**
+
 ```powershell
 .venv\Scripts\Activate.ps1
 ```
 
 **macOS / Linux**
+
 ```bash
 source .venv/bin/activate
 ```
 
-Install the dependencies:
+Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Create the backend environment file:
+Create the environment file.
 
 **Windows PowerShell**
+
 ```powershell
 Copy-Item .env.example .env
 ```
 
 **macOS / Linux**
+
 ```bash
 cp .env.example .env
 ```
 
-Open `backend/.env` and add your Groq API key:
+Add your Groq key to `backend/.env`:
 
 ```env
-GROQ_API_KEY=your_groq_api_key_here
+GROQ_API_KEY=your_groq_api_key
 GROQ_MODEL=openai/gpt-oss-120b
+
 SIMILARITY_THRESHOLD=0.35
 TOP_K=4
 NEWS_CACHE_MINUTES=30
+
+CORS_ORIGINS=https://hackathon-mind-flayers.vercel.app
 ```
 
-Build the local PDF vector index:
+Build the PDF index:
 
 ```bash
 python ingest.py
 ```
 
-This creates the FAISS index and its metadata under `backend/vectorstore/`. The first run downloads/initializes the embedding model and may take some time.
-
-Start the API server:
+Start FastAPI:
 
 ```bash
-python -m uvicorn api:app --reload --port 8000
+uvicorn api:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-The backend will be available at:
+The backend is available at:
 
-- API: `http://localhost:8000`
-- Interactive API documentation: `http://localhost:8000/docs`
-- Health check: `http://localhost:8000/api/health`
+- API base: `http://localhost:8000/api`
+- Health: `http://localhost:8000/api/health`
+- Swagger documentation: `http://localhost:8000/docs`
 
-### 3. Set up the frontend
+### 3. Configure and start the frontend
 
-Open a second terminal from the repository root:
+Open a second terminal:
 
 ```bash
 cd frontend
@@ -305,169 +320,216 @@ npm install
 Create the frontend environment file:
 
 **Windows PowerShell**
+
 ```powershell
 Copy-Item .env.example .env
 ```
 
 **macOS / Linux**
+
 ```bash
 cp .env.example .env
 ```
 
-The local API URL should be:
+Set the API base URL using the variable name read by `frontend/src/services/api.js`:
 
 ```env
 VITE_API_BASE_URL=http://localhost:8000/api
 ```
 
-Start the frontend:
+Then run:
 
 ```bash
 npm run dev
 ```
 
-Open `http://localhost:5173` in your browser.
+Open [http://localhost:5173](http://localhost:5173).
 
-### Quick start scripts
+### Quick-start scripts
 
-The repository also provides convenience scripts in the root directory:
+The repository also includes scripts in the root directory:
 
-| Operating system | Backend | Frontend |
+| Task | Windows | macOS / Linux |
 |---|---|---|
-| Windows | `.\start-backend.bat` | `.\start-frontend.bat` |
-| macOS / Linux | `./start-backend.sh` | `./start-frontend.sh` |
+| Start backend | `.\start-backend.bat` | `./start-backend.sh` |
+| Start frontend | `.\start-frontend.bat` | `./start-frontend.sh` |
 
-The backend script installs Python dependencies, creates `backend/.env` from the example if needed, builds the PDF index if it is missing, and starts Uvicorn. The frontend script installs npm dependencies and starts Vite.
+Run the backend and frontend in separate terminals.
 
 ---
 
-## Environment Configuration
+## Production Deployment
 
-### Backend — `backend/.env`
+Finbot's current deployment uses **Vercel for the React frontend** and **Render for the FastAPI backend**.
 
-| Variable | Purpose | Default / Example |
-|---|---|---|
-| `GROQ_API_KEY` | API key used for LLM answer generation | Required |
-| `GROQ_MODEL` | Groq model identifier | `openai/gpt-oss-120b` |
-| `SIMILARITY_THRESHOLD` | Minimum relevance threshold for retrieval | `0.35` |
-| `TOP_K` | Number of top retrieved chunks | `4` |
-| `NEWS_CACHE_MINUTES` | Cache duration for news feeds | `30` |
-| `CORS_ORIGINS` | Comma-separated deployed frontend origins | Optional |
+### Frontend — Vercel
 
-### Frontend — `frontend/.env`
+1. Import the GitHub repository into Vercel.
+2. Set the **Root Directory** to `frontend`.
+3. Use the following build settings:
 
-| Variable | Purpose | Local value |
-|---|---|---|
-| `VITE_API_BASE_URL` | Base URL for the FastAPI backend; include `/api` | `http://localhost:8000/api` |
+   | Setting | Value |
+   |---|---|
+   | Framework | Vite |
+   | Install command | `npm install` |
+   | Build command | `npm run build` |
+   | Output directory | `dist` |
 
-Do not commit real API keys or private environment files to version control.
+4. Add the production backend API URL as a Vercel environment variable. Use the exact variable name read in `frontend/src/services/api.js`.
+
+   ```env
+   VITE_API_BASE_URL=https://finbot-backend-iqgn.onrender.com/api
+   ```
+
+5. Redeploy after changing environment variables. Vite reads `VITE_*` values at build time.
+
+The repository includes `frontend/vercel.json` to rewrite frontend routes to `index.html`, allowing React Router routes to work after refreshing a page.
+
+### Backend — Render
+
+1. Create a new **Web Service** on Render and connect the repository.
+2. Set the **Root Directory** to `backend`.
+3. Configure:
+
+   | Setting | Value |
+   |---|---|
+   | Runtime | Python |
+   | Build command | `pip install -r requirements.txt && python ingest.py` |
+   | Start command | `uvicorn api:app --host 0.0.0.0 --port $PORT` |
+
+4. Add the required environment variables:
+
+   ```env
+   GROQ_API_KEY=your_groq_api_key
+   GROQ_MODEL=openai/gpt-oss-120b
+   SIMILARITY_THRESHOLD=0.35
+   TOP_K=4
+   NEWS_CACHE_MINUTES=30
+   CORS_ORIGINS=https://hackathon-mind-flayers.vercel.app
+   ```
+
+5. Deploy the service and check its health endpoint:
+
+   ```text
+   https://finbot-backend-iqgn.onrender.com/api/health
+   ```
+
+### Deployment checklist
+
+- [ ] Backend service is running on Render.
+- [ ] `GROQ_API_KEY` is configured in Render.
+- [ ] The PDF vector index is available after the backend build.
+- [ ] `CORS_ORIGINS` includes the exact Vercel frontend origin.
+- [ ] Vercel's API environment variable matches the variable name used in frontend source code.
+- [ ] The Vercel deployment was rebuilt after changing environment variables.
+- [ ] The frontend sends requests to `https://finbot-backend-iqgn.onrender.com/api`, not `localhost`.
+- [ ] `/api/health` responds successfully.
+- [ ] Profile, dashboard, chatbot, goals, simulator, expenses, news, and game flows have been tested on the deployed site.
+
+### Production troubleshooting
+
+| Symptom | What to check |
+|---|---|
+| Browser requests `localhost:8000` after deployment | The Vite API environment variable may be missing, incorrectly named, or not included in the latest Vercel build. Check `frontend/src/services/api.js`, Vercel Environment Variables, and redeploy. |
+| Browser reports a CORS error | Set `CORS_ORIGINS` on Render to `https://hackathon-mind-flayers.vercel.app` with no trailing slash, then redeploy/restart the backend. |
+| `ERR_CONNECTION_REFUSED` | Confirm the Render service is live and the frontend is using the deployed backend URL rather than localhost. |
+| First backend request is slow | A Render service may be waking from an idle period. Retry after the service has started. |
+| Chatbot fails but other API features work | Check the Render logs, `GROQ_API_KEY`, model configuration, and whether the FAISS index was generated successfully. |
+| Chatbot has no document evidence | Verify that `python ingest.py` completed and the vector index is present in the deployed backend environment. |
+| Data disappears after a redeploy | SQLite is file-based. Configure persistent storage for the database or use a managed database before relying on persistent production records. |
+
+> **Important:** Do not use `localhost` as the API URL in a deployed frontend. In a user's browser, `localhost` refers to that user's own device, not the Render backend.
 
 ---
 
 ## API Reference
 
-The backend exposes the following endpoints under `/api`.
+All application endpoints are exposed under `/api`.
 
-| Method | Endpoint | Purpose |
+| Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/health` | Check backend and RAG pipeline status |
-| `POST` | `/api/chat` | Submit a question to the AI Financial Coach |
-| `GET` | `/api/profile` | Retrieve the saved profile |
-| `POST` | `/api/profile` | Create a profile |
-| `PUT` | `/api/profile` | Update the profile |
-| `DELETE` | `/api/profile` | Clear profile data; use `?everything=true` to also clear goals and expenses |
-| `GET` | `/api/dashboard` | Retrieve dashboard summary metrics |
-| `GET` | `/api/budget/analysis` | Retrieve budget analysis |
-| `GET` | `/api/goals` | List financial goals |
-| `POST` | `/api/goals` | Create a financial goal |
-| `PUT` | `/api/goals/{goal_id}` | Update a goal |
-| `DELETE` | `/api/goals/{goal_id}` | Delete a goal |
-| `POST` | `/api/goals/plan` | Generate a deterministic goal savings plan |
-| `POST` | `/api/simulator/sip` | Calculate SIP projection and return scenarios |
-| `GET` | `/api/expenses` | List expenses; optional `month=YYYY-MM` filter |
-| `POST` | `/api/expenses` | Add an expense |
-| `GET` | `/api/expenses/summary` | Retrieve monthly expense totals and category breakdown |
-| `DELETE` | `/api/expenses/{expense_id}` | Delete an expense |
-| `GET` | `/api/news` | Retrieve RBI and SEBI updates |
-| `GET` | `/api/game/round` | Retrieve a Scam or Legit game round |
+| `GET` | `/api/health` | Reports RAG pipeline, index, and model readiness. |
+| `POST` | `/api/chat` | Sends a question to the AI Financial Coach. |
+| `GET` | `/api/profile` | Retrieves the saved financial profile. |
+| `POST` | `/api/profile` | Creates or saves a profile. |
+| `PUT` | `/api/profile` | Updates the profile. |
+| `DELETE` | `/api/profile` | Clears profile data; `?everything=true` also clears goals and expenses. |
+| `GET` | `/api/dashboard` | Retrieves dashboard summary values. |
+| `GET` | `/api/budget/analysis` | Retrieves monthly budget analysis. |
+| `GET` | `/api/goals` | Lists saved financial goals. |
+| `POST` | `/api/goals` | Creates a financial goal. |
+| `PUT` | `/api/goals/{goal_id}` | Updates a goal. |
+| `DELETE` | `/api/goals/{goal_id}` | Deletes a goal. |
+| `POST` | `/api/goals/plan` | Calculates a goal savings plan. |
+| `POST` | `/api/simulator/sip` | Calculates hypothetical SIP projections. |
+| `GET` | `/api/expenses` | Lists expenses; supports a month filter. |
+| `POST` | `/api/expenses` | Adds an expense. |
+| `GET` | `/api/expenses/summary` | Returns expense totals and category breakdown. |
+| `DELETE` | `/api/expenses/{expense_id}` | Deletes an expense. |
+| `GET` | `/api/news` | Retrieves RBI and SEBI news items. |
+| `GET` | `/api/game/round` | Retrieves a Scam or Legit game round. |
 
-For news, the `source` query parameter accepts `all`, `rbi`, or `sebi`. Use `refresh=true` to request a fresh feed fetch, subject to the service's refresh limit.
-
-For full request schemas and interactive endpoint testing, open `http://localhost:8000/docs` while the backend is running.
+For full request/response schemas, use the [live Swagger documentation](https://finbot-backend-iqgn.onrender.com/docs).
 
 ---
 
-## Data and Privacy
+## Financial Calculations
 
-- Profile, goal, and expense records are stored by the backend in a SQLite database.
-- The default database location is `backend/data/finguide.db`.
-- You can override the database path using `FINGUIDE_DB_PATH`.
-- The **Hide amounts** control masks displayed financial values in the frontend. Its preference is stored in browser local storage.
-- The **Clear data** flow can clear the saved profile. It also offers an option to delete goals and logged expenses.
-- The frontend communicates with the backend through the configured API base URL.
+Finbot separates deterministic calculations from AI-generated explanations.
 
-This project does not implement a full authentication system in the supplied code. Do not expose an unprotected deployment to public users or store real user financial data in a production environment without adding appropriate authentication, authorization, transport security, and operational safeguards.
+- **Investment percentage:** Monthly investment budget divided by monthly income, multiplied by 100.
+- **Budget analysis:** Uses profile income, recorded expenses, and active goal commitments to estimate the monthly balance and identify a deficit.
+- **Goal planning:** Estimates the contribution needed to reach a target based on current savings and the selected duration.
+- **SIP simulation:** Projects the future value of regular monthly contributions using the selected annual return assumption and duration. Scenario outputs are illustrative, not guaranteed.
+
+The application should make assumptions visible wherever it presents projections. Market returns are uncertain and actual outcomes can differ from simulations.
 
 ---
 
-## Running Tests
+## Data Storage and Privacy
 
-Backend tests are located in `backend/`.
+- The backend uses SQLite for profile, financial goal, and expense persistence.
+- The default database file is `backend/data/finguide.db`.
+- The database path can be overridden with `FINGUIDE_DB_PATH`.
+- The frontend's **Hide amounts** control masks financial values displayed in the interface.
+- The **Clear data** flow can clear the saved profile and, when selected, goals and expense records.
+- The frontend sends API requests to the configured backend URL.
 
-From the repository root:
+The supplied implementation does not include a complete user authentication and multi-user authorization system. Do not treat it as a production banking application or store highly sensitive financial information without adding appropriate authentication, access controls, encryption, backups, and privacy safeguards.
+
+---
+
+## Tests
+
+Backend test files are located in `backend/`.
+
+Run the tests from the backend directory:
 
 ```bash
-cd backend
 python -m unittest discover -p "test_*.py"
 ```
 
-Some chatbot/RAG tests require the PDF vector index to be built first:
+The chatbot and retrieval tests may require the PDF vector index to be generated first:
 
 ```bash
 python ingest.py
 ```
-
-Run the test suite after installing the backend dependencies and configuring the environment as required by the tests.
 
 ---
 
-## Deployment Notes
+## Contributing
 
-### Backend
+Contributions and improvements are welcome.
 
-Deploy the FastAPI application to a Python-compatible hosting service.
-
-Typical commands, executed from the `backend/` directory:
-
-```bash
-pip install -r requirements.txt
-python ingest.py
-uvicorn api:app --host 0.0.0.0 --port $PORT
-```
-
-Configure at least:
-
-- `GROQ_API_KEY`
-- `GROQ_MODEL` (if using a non-default model)
-- `CORS_ORIGINS` with the deployed frontend origin
-
-The PDF vector index must be generated or supplied to the deployed environment. The embedding model and FAISS index require additional memory and disk space. Since the application uses SQLite by default, configure persistent storage for the database if records must survive redeployments.
-
-### Frontend
-
-The frontend can be deployed to a static hosting platform such as Vercel or Netlify.
-
-From `frontend/`:
-
-```bash
-npm install
-npm run build
-```
-
-Set `VITE_API_BASE_URL` to the deployed backend URL ending in `/api`. The production build is generated in `frontend/dist/`.
+1. Fork the repository.
+2. Create a feature branch.
+3. Make focused changes and test them locally.
+4. Keep API calls inside the frontend service layer.
+5. Avoid committing `.env` files, API keys, local databases, or generated secrets.
+6. Submit a pull request with a clear description of the change.
 
 ---
 
 ## Disclaimer
 
-Finbot is intended for financial literacy and educational exploration. It provides informational responses and hypothetical calculations, not personalized regulated investment advice. It does not guarantee investment returns or account for every user's circumstances. Always verify important information with official sources and consult a SEBI-registered investment adviser before making investment decisions.
+Finbot is an educational and informational tool. It does not provide personalized regulated investment advice, guarantee returns, or replace a qualified financial professional. Investment values can rise or fall, and all simulations are hypothetical. Verify important information with official sources and consult a SEBI-registered investment adviser before making investment decisions.
