@@ -33,3 +33,16 @@ export const saveProfile = async (data, exists) => {
   }
   return request("/profile", { method: exists ? "PUT" : "POST", body: data });
 };
+
+export const clearData = async (everything = false) => {
+  if (USE_MOCK) {
+    mock.profile = null;
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (e) {
+      // ignore
+    }
+    return { status: "cleared" };
+  }
+  return request("/profile" + (everything ? "?everything=true" : ""), { method: "DELETE" });
+};

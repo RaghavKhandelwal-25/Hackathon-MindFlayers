@@ -6,8 +6,8 @@ const EXP = [
   "Intermediate (Some experience)",
   "Advanced (Active investor)",
 ];
-export default function ProfileModal({ onClose }) {
-  const { profile, save } = useFinance();
+export default function ProfileModal({ onClose, onSaved }) {
+  const { profile, save, clear } = useFinance();
   const [f, setF] = useState({
     fullName: "",
     email: "",
@@ -24,7 +24,21 @@ export default function ProfileModal({ onClose }) {
   });
   const [err, setErr] = useState({}),
     [busy, setBusy] = useState(false),
-    [apiErr, setApiErr] = useState("");
+    [apiErr, setApiErr] = useState(""),
+    [confirming, setConfirming] = useState(false),
+    [alsoAll, setAlsoAll] = useState(false);
+  const doClear = async () => {
+    setBusy(true);
+    setApiErr("");
+    try {
+      await clear(alsoAll);
+      onClose();
+    } catch {
+      setApiErr("Could not clear your data. Try again.");
+    } finally {
+      setBusy(false);
+    }
+  };
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   const validate = () => {
     const e = {};
@@ -53,6 +67,7 @@ export default function ProfileModal({ onClose }) {
     setApiErr("");
     try {
       await save(f);
+      onSaved?.();
       onClose();
     } catch {
       setApiErr("Could not save your profile. Try again.");
@@ -136,6 +151,32 @@ export default function ProfileModal({ onClose }) {
           </label>
         </div>
         {apiErr && <em className="apierr">{apiErr}</em>}
+        {profile && (
+          <div className="clearzone">
+            {!confirming ? (
+              <button type="button" className="linkbtn" onClick={() => setConfirming(true)}>
+                Clear my data…
+              </button>
+            ) : (
+              <div className="clearconfirm">
+                <strong>Clear your saved profile?</strong>
+                <span>This removes your details from the dashboard. It cannot be undone.</span>
+                <label>
+                  <input type="checkbox" checked={alsoAll} onChange={(e) => setAlsoAll(e.target.checked)} />
+                  Also delete my goals and logged expenses
+                </label>
+                <div className="row">
+                  <button type="button" className="danger" disabled={busy} onClick={doClear}>
+                    {busy ? "Clearing…" : "Yes, clear it"}
+                  </button>
+                  <button type="button" className="ghost" onClick={() => setConfirming(false)}>
+                    Keep my data
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         <div className="mfoot">
           <button type="button" className="ghost" onClick={onClose}>
             Cancel

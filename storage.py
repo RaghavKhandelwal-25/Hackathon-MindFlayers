@@ -717,3 +717,22 @@ def expense_summary(month: Optional[str] = None) -> Dict[str, Any]:
         "remainingVariableBudget": round(planned_variable - total, 2) if planned_variable > 0 else None,
         "percentOfIncome": round(total / income * 100, 1) if income > 0 else None,
     }
+
+
+# ==============================================================================
+# CLEAR USER DATA
+# ==============================================================================
+
+
+def clear_user_data(everything: bool = False) -> Dict[str, int]:
+    """Delete the saved profile. If `everything`, also delete goals and logged expenses."""
+    conn = get_db_connection()
+    try:
+        with conn:
+            removed = {"profile": conn.execute("DELETE FROM user_profile").rowcount}
+            if everything:
+                removed["goals"] = conn.execute("DELETE FROM financial_goals").rowcount
+                removed["expenses"] = conn.execute("DELETE FROM expenses").rowcount
+        return removed
+    finally:
+        conn.close()

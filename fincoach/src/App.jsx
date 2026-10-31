@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import Home from "./pages/Home.jsx";
 import Play from './pages/Play.jsx'
 import AppLayout from "./layouts/AppLayout.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
@@ -10,7 +11,8 @@ export default function App() {
   return (
     <Routes>
       <Route element={<AppLayout />}>
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/goals" element={<Goals />} />
         <Route path="/simulator" element={<Simulator />} />
         <Route path="/expenses" element={<Expenses />} />

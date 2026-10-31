@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { sendMessage } from "../services/chatService";
 import { useFinance } from "../context/FinanceContext";
+import SpendingPanel from "../components/SpendingPanel";
 import { getBudgetAnalysis } from "../services/dashboardService";
 
 export const DISCLAIMER =
@@ -190,7 +191,7 @@ export default function Dashboard() {
                 >
                   Monthly Income
                 </span>
-                <strong style={{ fontSize: "1.25rem" }}>
+                <strong className="money" style={{ fontSize: "1.25rem" }}>
                   {inr(budget.monthlyIncome)}
                 </strong>
               </div>
@@ -209,9 +210,9 @@ export default function Dashboard() {
                     display: "block",
                   }}
                 >
-                  Recorded Expenses
+                  Planned Expenses
                 </span>
-                <strong style={{ fontSize: "1.25rem" }}>
+                <strong className="money" style={{ fontSize: "1.25rem" }}>
                   {inr(budget.totalExpenses)}
                 </strong>
                 <small
@@ -241,7 +242,7 @@ export default function Dashboard() {
                 >
                   Goal Commitments
                 </span>
-                <strong style={{ fontSize: "1.25rem" }}>
+                <strong className="money" style={{ fontSize: "1.25rem" }}>
                   {inr(budget.totalGoalContributions)}
                 </strong>
                 <small
@@ -321,6 +322,8 @@ export default function Dashboard() {
           </div>
         )}
       </section>
+
+      <SpendingPanel />
 
       <section className="card chat">
         <div className="chat-head">

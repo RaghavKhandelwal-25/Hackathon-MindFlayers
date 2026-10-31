@@ -340,6 +340,13 @@ async def save_user_profile(payload: ProfilePayload):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
 
 
+@app.delete("/api/profile", tags=["Profile"])
+async def clear_user_profile(everything: bool = False):
+    """Clear the saved profile (and, with ?everything=true, goals and logged expenses too)."""
+    removed = storage.clear_user_data(everything)
+    return {"status": "cleared", "removed": removed}
+
+
 # ==============================================================================
 # DASHBOARD & BUDGET ANALYSIS ENDPOINTS
 # ==============================================================================

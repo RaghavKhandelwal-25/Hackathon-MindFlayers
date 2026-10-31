@@ -98,3 +98,20 @@ class TestChatExpenseQueries(unittest.TestCase):
     def test_not_triggered_for_advice_or_profile(self):
         for q in ["Should I spend more on mutual funds?", "What are my fixed expenses?", "What is an expense ratio?"]:
             self.assertNotEqual(self.ask(q).get("model_used"), "deterministic_tracker", q)
+
+
+class TestClearData(unittest.TestCase):
+    def setUp(self):
+        self.c = TestClient(app)
+        storage.save_profile({"fullName": "T", "monthlyIncome": 50000})
+        storage.create_expense({"amount": 100, "category": "Food"})
+
+    def test_clear_profile_only(self):
+        self.assertEqual(self.c.delete("/api/profile").status_code, 200)
+        self.assertEqual(self.c.get("/api/profile").json(), {})
+        self.assertEqual(len(storage.list_expenses()), 1)  # expenses kept
+
+    def test_clear_everything(self):
+        self.assertEqual(self.c.delete("/api/profile?everything=true").status_code, 200)
+        self.assertEqual(self.c.get("/api/profile").json(), {})
+        self.assertEqual(storage.list_expenses(), [])
