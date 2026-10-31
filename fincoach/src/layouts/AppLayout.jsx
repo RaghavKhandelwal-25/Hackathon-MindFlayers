@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
-import { LayoutDashboard, Target, UserRound, Wallet } from 'lucide-react'
+import { LayoutDashboard, Target, UserRound, Wallet, TrendingUp, Receipt } from 'lucide-react'
 import { useFinance } from '../context/FinanceContext'
 import ProfileModal from '../components/ProfileModal'
 const inr = n => '₹' + Math.round(n || 0).toLocaleString('en-IN')
@@ -11,9 +11,11 @@ export default function AppLayout() {
   return (
     <div className="shell">
       <nav className="sidebar" aria-label="Main">
-        <div className="brand"><Wallet size={22} /><span>Ledgerly</span></div>
+        <div className="brand"><Wallet size={22} /><div className="brand-text"><span className="brand-name">Finbot</span><span className="brand-tag">Make smarter financial decisions</span></div></div>
         <NavLink to="/" end className="nav"><LayoutDashboard size={18} /><span>Dashboard</span></NavLink>
         <NavLink to="/goals" className="nav"><Target size={18} /><span>Set Goals</span></NavLink>
+        <NavLink to="/simulator" className="nav"><TrendingUp size={18} /><span>Simulator</span></NavLink>
+        <NavLink to="/expenses" className="nav"><Receipt size={18} /><span>Expenses</span></NavLink>
       </nav>
       <main className="main">
         <header className="head">

@@ -15,7 +15,7 @@ from typing import Any, Dict, List, Optional, Union
 import dotenv
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import AliasChoices, BaseModel, Field
 
 # Load environment variables
 BASE_DIR = Path(__file__).resolve().parent
@@ -180,6 +180,23 @@ class GoalPlanPayload(BaseModel):
     currentSavings: Optional[float] = 0.0
     months: int = Field(..., gt=0)
     monthlyContribution: Optional[float] = None
+
+
+class SipSimulatorPayload(BaseModel):
+    model_config = {"populate_by_name": True}
+
+    monthlyContribution: float = Field(..., gt=0, validation_alias=AliasChoices("monthlyContribution", "monthlyAmount", "monthly"))
+    annualReturn: float = Field(..., ge=0, le=100, validation_alias=AliasChoices("annualReturn", "annualReturnPct", "expectedReturn", "rate"))
+    years: Optional[float] = Field(None, gt=0, le=60)
+    months: Optional[int] = Field(None, gt=0, le=720)
+    targetAmount: Optional[float] = Field(None, gt=0)
+
+
+class ExpensePayload(BaseModel):
+    amount: float = Field(..., gt=0)
+    category: Optional[str] = "Other"
+    note: Optional[str] = None
+    date: Optional[str] = Field(None, description="YYYY-MM-DD, defaults to today")
 
 
 @app.on_event("startup")
@@ -448,3 +465,56 @@ async def generate_goal_plan(payload: GoalPlanPayload):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error calculating goal plan: {str(exc)}",
         )
+
+
+# ==============================================================================
+# SIP "WHAT IF" SIMULATOR
+# ==============================================================================
+
+
+@app.post("/api/simulator/sip", tags=["Simulator"])
+async def simulate_sip(payload: SipSimulatorPayload):
+    """Simulate SIP growth: summary, growth series, return scenarios and optional goal check."""
+    from finance_calculators import simulate_sip_whatif
+
+    if payload.months is None and payload.years is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Provide 'years' or 'months'.")
+    months = payload.months if payload.months is not None else int(round(payload.years * 12))
+    try:
+        return simulate_sip_whatif(payload.monthlyContribution, payload.annualReturn, months, payload.targetAmount)
+    except ValueError as ve:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
+
+
+# ==============================================================================
+# EXPENSE TRACKING ENDPOINTS
+# ==============================================================================
+
+
+@app.get("/api/expenses", tags=["Expenses"])
+async def list_user_expenses(month: Optional[str] = None):
+    """List logged expenses (optionally for one month, format YYYY-MM)."""
+    return storage.list_expenses(month)
+
+
+@app.post("/api/expenses", tags=["Expenses"])
+async def add_user_expense(payload: ExpensePayload):
+    """Log a new expense."""
+    try:
+        return storage.create_expense(payload.model_dump())
+    except ValueError as ve:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
+
+
+@app.get("/api/expenses/summary", tags=["Expenses"])
+async def get_expense_summary(month: Optional[str] = None):
+    """Spending total and per-category breakdown for a month (default: current)."""
+    return storage.expense_summary(month)
+
+
+@app.delete("/api/expenses/{expense_id}", tags=["Expenses"])
+async def delete_user_expense(expense_id: str):
+    """Delete a logged expense."""
+    if not storage.delete_expense(expense_id):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Expense '{expense_id}' not found.")
+    return {"status": "deleted", "id": expense_id}
