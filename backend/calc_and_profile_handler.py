@@ -1,4 +1,4 @@
-"""FinGuide Profile-Aware and Deterministic Calculation Handler.
+"""Finbot Profile-Aware and Deterministic Calculation Handler.
 
 Responsible for:
 1. Detecting user-profile inquiries (income, expenses, budget, goals, preferences)

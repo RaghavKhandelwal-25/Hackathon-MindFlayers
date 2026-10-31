@@ -1,4 +1,4 @@
-"""FinGuide Query Router and Intent Processing Module.
+"""Finbot Query Router and Intent Processing Module.
 
 Handles lightweight intent classification, financial terminology spelling normalization,
 and conversational follow-up contextualization without heavy external frameworks.
@@ -251,7 +251,7 @@ def classify_intent(
     for pattern in GREETING_PATTERNS:
         if re.search(pattern, lower_query):
             greeting_msg = (
-                "👋 **Hello! Welcome to FinGuide.**\n\n"
+                "👋 **Hello! Welcome to Finbot.**\n\n"
                 "I am your AI assistant for financial education. I can help answer questions on:\n"
                 "- **Personal Finance & Budgeting** (the 50/30/20 rule, emergency funds, debt snowball vs. avalanche)\n"
                 "- **Investing Fundamentals** (stocks, bonds, index funds, expense ratios, compound interest)\n"
@@ -308,7 +308,7 @@ def classify_intent(
     for pattern in OUT_OF_SCOPE_PATTERNS:
         if re.search(pattern, lower_query):
             scope_msg = (
-                "ℹ️ **Topic Outside Scope**: FinGuide is dedicated exclusively to **financial education and investing literacy**.\n\n"
+                "ℹ️ **Topic Outside Scope**: Finbot is dedicated exclusively to **financial education and investing literacy**.\n\n"
                 "I cannot answer questions related to software coding, cooking recipes, weather, pop culture, or general knowledge. "
                 "Please feel free to ask questions about budgeting, mutual funds, compound interest, retirement accounts, or financial planning!"
             )

@@ -1,4 +1,4 @@
-"""FinGuide Generalized Query Understanding and Multi-Query Decomposition Module.
+"""Finbot Generalized Query Understanding and Multi-Query Decomposition Module.
 
 Analyzes the structural and semantic information needs of user queries (factual,
 comparative, advantages/disadvantages, causal, multi-part, risks/limitations, etc.)

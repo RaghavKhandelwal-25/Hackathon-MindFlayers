@@ -1,4 +1,4 @@
-"""FinGuide Document Ingestion Pipeline.
+"""Finbot Document Ingestion Pipeline.
 
 Extracts text page-by-page from PDF files in data/pdfs/ using PyMuPDF,
 chunks the text with preserved document and page metadata, computes
@@ -24,7 +24,7 @@ except ImportError:
 import dotenv
 import numpy as np
 
-# Load environment variables explicitly from finguide/.env if present
+# Load environment variables explicitly from backend/.env if present
 _BASE_DIR = Path(__file__).resolve().parent
 _ENV_PATH = _BASE_DIR / ".env"
 if _ENV_PATH.exists():
@@ -325,19 +325,19 @@ def ingest_documents(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="FinGuide PDF Ingestion and Vector Store Generation"
+        description="Finbot PDF Ingestion and Vector Store Generation"
     )
     parser.add_argument(
         "--data-dir",
         type=str,
         default=None,
-        help="Path to directory containing PDF files (defaults to finguide/data/pdfs)",
+        help="Path to directory containing PDF files (defaults to backend/data/pdfs)",
     )
     parser.add_argument(
         "--vectorstore-dir",
         type=str,
         default=None,
-        help="Path to directory where FAISS index and metadata will be saved (defaults to finguide/vectorstore)",
+        help="Path to directory where FAISS index and metadata will be saved (defaults to backend/vectorstore)",
     )
     parser.add_argument(
         "--chunk-size",

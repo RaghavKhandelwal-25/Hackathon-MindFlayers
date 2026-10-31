@@ -1,4 +1,4 @@
-"""FinGuide Streamlit Chat Application.
+"""Finbot Streamlit Chat Application.
 
 Interactive financial education assistant combining verified local PDF documents
 with official Indian financial regulatory & educational sources (RBI, SEBI, NCFE).
@@ -17,7 +17,7 @@ import streamlit as st
 
 # Configure page metadata
 st.set_page_config(
-    page_title="FinGuide — Hybrid Financial Education Assistant",
+    page_title="Finbot — Hybrid Financial Education Assistant",
     page_icon="🪙",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -66,7 +66,7 @@ def main():
     st.markdown(
         """
         <div style="padding: 0.8rem 0; border-bottom: 2px solid #e0e0e0; margin-bottom: 1.2rem;">
-            <h1 style="margin: 0; display: inline-block;">🪙 FinGuide</h1>
+            <h1 style="margin: 0; display: inline-block;">🪙 Finbot</h1>
             <span style="font-size: 1.2rem; color: #444; margin-left: 12px; font-weight: 500;">
                 Hybrid Financial Education Assistant
             </span>
@@ -205,7 +205,7 @@ def main():
             st.rerun()
 
         st.caption(
-            "⚠️ **Disclaimer**: FinGuide provides financial education only. "
+            "⚠️ **Disclaimer**: Finbot provides financial education only. "
             "It does not provide personalized investment advice or guaranteed return forecasts."
         )
 
@@ -213,8 +213,8 @@ def main():
     if not st.session_state.messages:
         st.markdown(
             """
-            ### Welcome to FinGuide! 🪙
-            Your dual-source financial literacy companion. FinGuide explains financial concepts in beginner-friendly language,
+            ### Welcome to Finbot! 🪙
+            Your dual-source financial literacy companion. Finbot explains financial concepts in beginner-friendly language,
             strictly grounded in **local financial education booklets** and **official Indian regulatory portals** (RBI, SEBI, NCFE).
             
             #### 💡 Try Asking:

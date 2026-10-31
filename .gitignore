@@ -1,9 +1,9 @@
 # Virtual environments
 .venv/
 venv/
+venv312/
 ENV/
 env/
-venv312/
 
 # Python cache & artifacts
 __pycache__/
@@ -12,34 +12,28 @@ __pycache__/
 *.so
 .pytest_cache/
 
-# Vector store persistence generated files
-vectorstore/index.faiss
-vectorstore/metadata.json
+# Generated document index (rebuild with: python ingest.py, inside backend/)
+backend/vectorstore/index.faiss
+backend/vectorstore/metadata.json
 
-# Environment variables & secrets
+# Environment variables & secrets (templates named .env.example ARE committed)
 .env
 .env.local
 *.env
-fincoach/.env
-fincoach/.env.local
 
-# Frontend node_modules & build output
+# Frontend dependencies & build output
 node_modules/
-fincoach/node_modules/
 dist/
-fincoach/dist/
 .idea/
 
 # Local databases
-data/finguide.db
-data/finguide.db-journal
 *.db
 *.db-journal
 *.db-wal
 
-# Streamlit config & secrets
+# Streamlit secrets
 .streamlit/secrets.toml
 
-# OS generated files
+# OS files
 .DS_Store
 Thumbs.db
