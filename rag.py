@@ -47,6 +47,7 @@ except ImportError:
 try:
     from calc_and_profile_handler import (
         handle_calculation_query,
+        handle_expense_query,
         handle_goal_and_budget_chat_query,
         handle_percentage_query,
         handle_profile_question,
@@ -54,6 +55,7 @@ try:
 except ImportError:
     from finguide.calc_and_profile_handler import (
         handle_calculation_query,
+        handle_expense_query,
         handle_goal_and_budget_chat_query,
         handle_percentage_query,
         handle_profile_question,
@@ -462,6 +464,20 @@ Instructions:
                 profile = storage.get_profile()
             except Exception:
                 profile = None
+
+        exp_res = handle_expense_query(question, profile=profile)
+        if exp_res and exp_res.is_handled:
+            return RAGResult(
+                question=question,
+                answer=exp_res.markdown_answer,
+                sources=[],
+                web_sources=[],
+                model_used="deterministic_tracker",
+                sufficient_evidence=True,
+                interpreted_query=question,
+                intent="expense_tracking",
+                query_type="expense_tracking",
+            )
 
         pct_res = handle_percentage_query(question, profile=profile)
         if pct_res and pct_res.is_handled:

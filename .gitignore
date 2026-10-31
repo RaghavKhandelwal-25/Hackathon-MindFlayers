@@ -3,6 +3,7 @@
 venv/
 ENV/
 env/
+venv312/
 
 # Python cache & artifacts
 __pycache__/

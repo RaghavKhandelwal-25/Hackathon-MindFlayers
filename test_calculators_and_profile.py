@@ -13,6 +13,9 @@ Covers:
 
 from __future__ import annotations
 
+import os as _os, tempfile as _tf
+_os.environ.setdefault("FINGUIDE_DB_PATH", _os.path.join(_tf.mkdtemp(), "test_finguide.db"))  # never touch the real database
+
 import math
 import sys
 import unittest

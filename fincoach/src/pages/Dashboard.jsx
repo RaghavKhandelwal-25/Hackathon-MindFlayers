@@ -14,6 +14,7 @@ const SUGGEST = [
   'Calculate my budget breakdown',
   'How much money remains after my recorded expenses?',
   'What are my financial goals?',
+  'How much have I spent this month?',
   'If I invest ₹5,000 monthly in an SIP for 10 years at 12%, how much will it become?',
   'Explain the 50/30/20 budgeting rule in simple language.',
 ]

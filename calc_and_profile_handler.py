@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import math
 import re
+from datetime import date, timedelta
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -40,6 +41,7 @@ class CalculationType(str, Enum):
     PERCENTAGE_OF_PROFILE = "percentage_of_profile"
     GOAL_PLAN = "goal_plan"
     BUDGET_ANALYSIS = "budget_analysis"
+    EXPENSE_TRACKING = "expense_tracking"
     UNKNOWN = "unknown"
 
 
@@ -1039,3 +1041,151 @@ def handle_goal_and_budget_chat_query(
         )
 
     return None
+
+
+# ==============================================================================
+# EXPENSE TRACKING CHAT QUERIES (uses expenses logged on the Expenses page)
+# ==============================================================================
+
+_CATEGORY_WORDS = {
+    "Food": ["food", "dining", "groceries", "grocery", "restaurant", "restaurants", "eating", "lunch", "dinner", "snacks"],
+    "Transport": ["transport", "travel", "fuel", "petrol", "cab", "uber", "bus", "metro", "commute"],
+    "Shopping": ["shopping", "clothes", "clothing", "amazon"],
+    "Bills": ["bills", "bill", "rent", "electricity", "recharge", "internet"],
+    "Entertainment": ["entertainment", "movie", "movies", "games", "gaming", "netflix", "outings"],
+    "Health": ["health", "medical", "medicine", "medicines", "doctor", "gym"],
+    "Education": ["education", "books", "course", "courses", "tuition", "fees"],
+}
+_MONTHS = {m: i for i, m in enumerate(
+    ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"], 1)}
+
+
+def _expense_period(q: str, today: date) -> Tuple[Optional[str], Optional[str], str]:
+    """Return (start, end, label) for the period mentioned in the query."""
+    iso = lambda d: d.isoformat()
+    if "yesterday" in q:
+        d = today - timedelta(days=1)
+        return iso(d), iso(d), "yesterday"
+    if re.search(r"\btoday\b", q):
+        return iso(today), iso(today), "today"
+    if re.search(r"\b(last|past|previous)\s+week\b", q):
+        return iso(today - timedelta(days=6)), iso(today), "the last 7 days"
+    if re.search(r"\bthis\s+week\b", q):
+        return iso(today - timedelta(days=today.weekday())), iso(today), "this week"
+    if re.search(r"\b(last|previous)\s+month\b", q):
+        first_this = today.replace(day=1)
+        last_prev = first_this - timedelta(days=1)
+        return iso(last_prev.replace(day=1)), iso(last_prev), last_prev.strftime("%B %Y")
+    for name, num in _MONTHS.items():
+        if re.search(rf"\b{name}\b", q) and not (name == "may" and not re.search(r"\b(in|during|for|of)\s+may\b", q)):
+            ym = re.search(rf"{name}\s+(20\d\d)", q)
+            year = int(ym.group(1)) if ym else (today.year if num <= today.month else today.year - 1)
+            first = date(year, num, 1)
+            nxt = date(year + (num == 12), (num % 12) + 1, 1)
+            return iso(first), iso(nxt - timedelta(days=1)), first.strftime("%B %Y")
+    if re.search(r"\b(all\s+time|overall|in\s+total|ever)\b", q):
+        return None, None, "all time"
+    first = today.replace(day=1)
+    return iso(first), iso(today), "this month"
+
+
+def _expense_category(q: str, known: List[str]) -> Optional[str]:
+    for cat in known:
+        if re.search(rf"\b{re.escape(cat.lower())}s?\b", q):
+            return cat
+    for canon, words in _CATEGORY_WORDS.items():
+        if any(re.search(rf"\b{w}\b", q) for w in words):
+            for cat in known:
+                if cat.lower() == canon.lower():
+                    return cat
+            return canon
+    return None
+
+
+def handle_expense_query(query: str, profile: Optional[Dict[str, Any]] = None) -> Optional[CalculationResult]:
+    """Answer questions about expenses the user has logged (totals, categories, recent items)."""
+    if not query:
+        return None
+    q = query.lower().strip()
+
+    if not re.search(r"\b(spent|spend|spending|expenditures?|expenses?|transactions?|purchases)\b", q):
+        return None
+    # advice / definition questions are not about the user's logged data
+    if re.search(r"\b(should i|can i|how (?:can|do|to) (?:i )?(?:reduce|cut|save)|tips|ideas|budget for)\b", q):
+        return None
+    if re.search(r"\b(what is|what are|explain|define|meaning of)\b", q) and not re.search(r"\b(my|i)\b", q):
+        return None
+    if re.search(r"\b(fixed|variable|monthly budget|expense ratio)\b", q):
+        return None
+
+    personal = bool(re.search(
+        r"\b(did i|have i|i have|i've|i spent|i spend|my spending|my expenditures?|so far|logged|tracked|my transactions|my purchases|recent|latest)\b", q))
+    today = date.today()
+    start, end, label = _expense_period(q, today)
+    has_period = label != "this month" or bool(re.search(r"\bthis month\b", q))
+    if not (personal or (has_period and re.search(r"\bmy\b", q))):
+        return None
+
+    all_items = storage.list_expenses()
+    if not all_items:
+        if not personal:
+            return None  # let profile questions fall through
+        return CalculationResult(
+            is_handled=True,
+            calc_type=CalculationType.EXPENSE_TRACKING,
+            markdown_answer=(
+                "### 🧾 No expenses logged yet\n\n"
+                "You haven't logged any expenses yet. Open the **Expenses** page, add what you spend, "
+                "and I can then answer questions like *\"How much did I spend on food this month?\"*."
+            ),
+        )
+
+    known = sorted({e["category"] for e in all_items})
+    category = _expense_category(q, known)
+    items = storage.list_expenses(start=start, end=end)
+    if category:
+        items = [e for e in items if e["category"].lower() == category.lower()]
+    scope = f"on **{category}**" if category else ""
+
+    # List / recent transactions
+    if re.search(r"\b(show|list|recent|latest|transactions?|purchases)\b", q) and not re.search(r"\bhow much\b", q):
+        m = re.search(r"\b(?:last|latest|recent)\s+(\d{1,2})\b", q)
+        limit = int(m.group(1)) if m else 10
+        shown = items[:limit]
+        if not shown:
+            return CalculationResult(True, CalculationType.EXPENSE_TRACKING,
+                                     f"### 🧾 Expenses\n\nNo expenses found {scope} for **{label}**.".replace("  ", " "))
+        rows = "\n".join(f"| {e['date']} | {e['category']} | {format_inr(e['amount'])} | {e['note'] or '-'} |" for e in shown)
+        return CalculationResult(
+            True, CalculationType.EXPENSE_TRACKING,
+            f"### 🧾 Your latest expenses ({label})\n\n| Date | Category | Amount | Note |\n| :--- | :--- | ---: | :--- |\n{rows}\n\n"
+            f"Showing {len(shown)} of {len(items)} expense(s), totalling **{format_inr(sum(e['amount'] for e in items))}**.",
+            raw_data={"count": len(items)},
+        )
+
+    total = sum(e["amount"] for e in items)
+    if not items:
+        return CalculationResult(True, CalculationType.EXPENSE_TRACKING,
+                                 f"### 🧾 Spending ({label})\n\nYou have no logged expenses {scope} for **{label}**.".replace("  ", " "))
+
+    by_cat: Dict[str, float] = {}
+    for e in items:
+        by_cat[e["category"]] = by_cat.get(e["category"], 0.0) + e["amount"]
+
+    when = label if label.startswith(("this", "today", "yesterday", "the last")) else f"in {label}"
+    lines = [f"### 🧾 Spending {scope} - {label}".replace("  ", " "), "",
+             f"You spent **{format_inr(total)}** {scope} across **{len(items)}** logged expense(s) {when}.".replace("  ", " ")]
+    if not category and len(by_cat) > 1:
+        rows = "\n".join(f"| {c} | {format_inr(a)} | {a / total * 100:.1f}% |" for c, a in sorted(by_cat.items(), key=lambda kv: -kv[1]))
+        top = max(by_cat.items(), key=lambda kv: kv[1])
+        lines += ["", "| Category | Amount | Share |", "| :--- | ---: | ---: |", rows, "", f"Your biggest category is **{top[0]}** ({top[1] / total * 100:.0f}% of spending)."]
+    income = float((profile or storage.get_profile() or {}).get("monthlyIncome") or 0.0)
+    planned = float((profile or storage.get_profile() or {}).get("variableExpenses") or 0.0)
+    if label == "this month" and not category:
+        if planned > 0:
+            diff = planned - total
+            lines += ["", (f"Against your planned variable expenses of {format_inr(planned)}, you have **{format_inr(diff)}** left." if diff >= 0
+                            else f"⚠️ That is **{format_inr(-diff)} over** your planned variable expenses of {format_inr(planned)}.")]
+        if income > 0:
+            lines += [f"That is {total / income * 100:.1f}% of your monthly income."]
+    return CalculationResult(True, CalculationType.EXPENSE_TRACKING, "\n".join(lines), raw_data={"total": total, "count": len(items)})

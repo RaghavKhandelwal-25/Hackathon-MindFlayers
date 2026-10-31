@@ -23,7 +23,7 @@ logger = logging.getLogger("finguide.storage")
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
-DB_PATH = DATA_DIR / "finguide.db"
+DB_PATH = Path(os.getenv("FINGUIDE_DB_PATH") or (DATA_DIR / "finguide.db"))
 
 
 def get_db_connection() -> sqlite3.Connection:
@@ -70,6 +70,18 @@ def init_db():
                     description TEXT,
                     created_at TEXT,
                     updated_at TEXT
+                )
+                """
+            )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS expenses (
+                    id TEXT PRIMARY KEY,
+                    amount REAL NOT NULL,
+                    category TEXT NOT NULL,
+                    note TEXT,
+                    spent_on TEXT NOT NULL,
+                    created_at TEXT
                 )
                 """
             )
@@ -591,4 +603,117 @@ def calculate_budget_analysis(profile_override: Optional[Dict[str, Any]] = None)
             "Investment budget is treated as an intended allocation capacity, not double-counted as an expense",
             "Remaining balance represents unallocated monthly surplus available for emergency reserves or investments",
         ],
+    }
+
+
+# ==============================================================================
+# EXPENSE TRACKING
+# ==============================================================================
+
+
+def _expense_row(row: sqlite3.Row) -> Dict[str, Any]:
+    return {
+        "id": row["id"],
+        "amount": row["amount"],
+        "category": row["category"],
+        "note": row["note"] or "",
+        "date": row["spent_on"],
+    }
+
+
+def list_expenses(
+    month: Optional[str] = None, start: Optional[str] = None, end: Optional[str] = None
+) -> List[Dict[str, Any]]:
+    """List logged expenses, newest first.
+
+    `month` is 'YYYY-MM'; `start`/`end` are inclusive 'YYYY-MM-DD' bounds (all optional).
+    """
+    conn = get_db_connection()
+    try:
+        if start or end:
+            rows = conn.execute(
+                "SELECT * FROM expenses WHERE spent_on >= ? AND spent_on <= ? ORDER BY spent_on DESC, created_at DESC",
+                (start or "0000-01-01", end or "9999-12-31"),
+            ).fetchall()
+        elif month:
+            rows = conn.execute(
+                "SELECT * FROM expenses WHERE spent_on LIKE ? ORDER BY spent_on DESC, created_at DESC",
+                (f"{month}%",),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT * FROM expenses ORDER BY spent_on DESC, created_at DESC"
+            ).fetchall()
+        return [_expense_row(r) for r in rows]
+    finally:
+        conn.close()
+
+
+def create_expense(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Log a single expense."""
+    try:
+        amount = float(data["amount"])
+    except (KeyError, TypeError, ValueError):
+        raise ValueError("A numeric expense amount is required.")
+    if amount <= 0:
+        raise ValueError("Expense amount must be greater than zero.")
+    category = str(data.get("category") or "").strip() or "Other"
+    spent_on = str(data.get("date") or "").strip() or datetime.now().strftime("%Y-%m-%d")
+    try:
+        datetime.strptime(spent_on, "%Y-%m-%d")
+    except ValueError:
+        raise ValueError("Date must be in YYYY-MM-DD format.")
+    expense_id = f"exp_{int(time.time() * 1000)}"
+    conn = get_db_connection()
+    try:
+        with conn:
+            conn.execute(
+                "INSERT INTO expenses (id, amount, category, note, spent_on, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                (
+                    expense_id,
+                    amount,
+                    category,
+                    str(data.get("note") or "").strip(),
+                    spent_on,
+                    datetime.now(timezone.utc).isoformat(),
+                ),
+            )
+        row = conn.execute("SELECT * FROM expenses WHERE id = ?", (expense_id,)).fetchone()
+        return _expense_row(row)
+    finally:
+        conn.close()
+
+
+def delete_expense(expense_id: str) -> bool:
+    conn = get_db_connection()
+    try:
+        with conn:
+            cur = conn.execute("DELETE FROM expenses WHERE id = ?", (expense_id,))
+        return cur.rowcount > 0
+    finally:
+        conn.close()
+
+
+def expense_summary(month: Optional[str] = None) -> Dict[str, Any]:
+    """Total and per-category spending for a month (default: current month)."""
+    month = month or datetime.now().strftime("%Y-%m")
+    items = list_expenses(month)
+    by_cat: Dict[str, float] = {}
+    for e in items:
+        by_cat[e["category"]] = by_cat.get(e["category"], 0.0) + e["amount"]
+    total = sum(by_cat.values())
+    profile = get_profile() or {}
+    income = float(profile.get("monthlyIncome") or 0.0)
+    planned_variable = float(profile.get("variableExpenses") or 0.0)
+    return {
+        "month": month,
+        "count": len(items),
+        "totalSpent": round(total, 2),
+        "byCategory": [
+            {"category": c, "amount": round(a, 2), "percentage": round(a / total * 100, 1) if total else 0.0}
+            for c, a in sorted(by_cat.items(), key=lambda kv: -kv[1])
+        ],
+        "plannedVariableExpenses": round(planned_variable, 2),
+        "remainingVariableBudget": round(planned_variable - total, 2) if planned_variable > 0 else None,
+        "percentOfIncome": round(total / income * 100, 1) if income > 0 else None,
     }

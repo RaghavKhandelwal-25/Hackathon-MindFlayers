@@ -336,3 +336,55 @@ def calculate_inflation(
             "cost_difference": format_inr(difference),
         },
     }
+
+
+SIM_DISCLAIMER = (
+    "Educational illustration only, not investment advice. Market returns are not guaranteed "
+    "and past performance does not predict future results."
+)
+
+
+def simulate_sip_whatif(
+    monthly_contribution: float,
+    annual_return_pct: float,
+    duration_months: int,
+    target_amount: Optional[float] = None,
+) -> Dict[str, Any]:
+    """'What if' SIP simulator: summary, growth series, return scenarios and optional goal check."""
+    summary = calculate_sip(monthly_contribution, annual_return_pct, duration_months=duration_months)
+    n = summary["duration_months"]
+    i = annual_return_pct / 100.0 / 12.0
+
+    series = [{"month": 0, "invested": 0.0, "value": 0.0}]
+    value = 0.0
+    for m in range(1, n + 1):
+        value = (value + monthly_contribution) * (1.0 + i)
+        series.append({"month": m, "invested": round(monthly_contribution * m, 2), "value": round(value, 2)})
+
+    scenarios = []
+    for label, rate in (("Pessimistic", max(annual_return_pct - 2.0, 0.0)), ("Expected", annual_return_pct), ("Optimistic", annual_return_pct + 2.0)):
+        s = calculate_sip(monthly_contribution, rate, duration_months=n)
+        scenarios.append({"label": label, "annualReturnPct": rate, "estimatedFutureValue": s["estimated_future_value"]})
+
+    result: Dict[str, Any] = {"summary": summary, "series": series, "scenarios": scenarios, "disclaimer": SIM_DISCLAIMER}
+
+    if target_amount and target_amount > 0:
+        if i == 0:
+            required = target_amount / n
+        else:
+            required = target_amount / ((((1.0 + i) ** n - 1.0) / i) * (1.0 + i))
+        months_to_target = None
+        v = 0.0
+        for m in range(1, 1201):
+            v = (v + monthly_contribution) * (1.0 + i)
+            if v >= target_amount:
+                months_to_target = m
+                break
+        result["goalCheck"] = {
+            "targetAmount": round(target_amount, 2),
+            "reachesTarget": summary["estimated_future_value"] >= target_amount,
+            "shortfall": round(max(target_amount - summary["estimated_future_value"], 0.0), 2),
+            "requiredMonthlyContribution": round(required, 2),
+            "monthsToTarget": months_to_target,
+        }
+    return result

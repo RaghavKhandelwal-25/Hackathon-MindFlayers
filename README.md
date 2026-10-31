@@ -1,3 +1,25 @@
+# FinGuide / FinCoach - AI Financial Coach
+
+## Quick start (React app + API)
+1. Backend: run `start-backend.bat` (Windows) or `./start-backend.sh`. First run creates `.env` - paste your `GROQ_API_KEY` into it and run again. The first run also builds the document index (needs internet).
+2. Frontend (second terminal): run `start-frontend.bat` or `./start-frontend.sh`, then open http://localhost:5173
+3. API docs: http://localhost:8000/docs
+
+PowerShell tip: type `.\start-backend.bat` (with the `.\`).
+
+## API endpoints
+| Area | Endpoints |
+|---|---|
+| Chat (RAG + calculations) | `POST /api/chat`, `GET /api/health` |
+| Profile / dashboard | `GET/POST/PUT /api/profile`, `GET /api/dashboard`, `GET /api/budget/analysis` |
+| Goals | `GET/POST /api/goals`, `PUT/DELETE /api/goals/{id}`, `POST /api/goals/plan` |
+| SIP "what if" simulator | `POST /api/simulator/sip` |
+| Expense tracking | `GET/POST /api/expenses`, `GET /api/expenses/summary`, `DELETE /api/expenses/{id}` |
+
+Tests: `python -m unittest discover -p "test_*.py"` (they use a temporary database, your real data is not touched).
+
+---
+
 # FinGuide — Hybrid Financial Education Assistant
 
 FinGuide is an AI-powered financial education assistant built with Python, Streamlit, Groq, Sentence Transformers, FAISS, and PyMuPDF.

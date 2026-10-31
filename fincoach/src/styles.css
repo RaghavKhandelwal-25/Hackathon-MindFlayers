@@ -99,3 +99,18 @@ label{display:block;font-size:.85rem;color:var(--soft)}label em,form>em,.goalfor
 .markdown-body th{background:#3E4A3218;font-weight:700;color:var(--ink)}
 .markdown-body tr:nth-child(even){background:#2b262006}
 
+
+/* Simulator & Expenses */
+.stats.three{grid-template-columns:repeat(3,1fr)}
+.grid5.sim,.grid5.exp{grid-template-columns:1fr 1fr 1fr 1fr auto;align-items:end}
+.simbtn{display:flex;align-items:flex-end}
+.goalcheck.ok{border-left:6px solid #4A5640}.goalcheck.warn{border-left:6px solid #9b3b2e}.goalcheck p{margin:0}
+.scen{padding:8px 0}.bar.full{width:100%}
+@media(max-width:900px){.stats.three{grid-template-columns:1fr}.grid5.sim,.grid5.exp{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.grid5.sim,.grid5.exp{grid-template-columns:1fr}}
+
+
+.brand{align-items:center}
+.brand-text{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.brand-name{font-size:1.35rem;font-weight:800;letter-spacing:-.02em}
+.brand-tag{font-size:11px;font-weight:400;color:var(--soft);letter-spacing:.01em;margin-top:2px}
