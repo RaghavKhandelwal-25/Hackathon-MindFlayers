@@ -1,0 +1,28 @@
+/* Scam or Legit? */
+.gtop{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.gtop small{color:var(--soft)}
+.gtimer{height:8px;background:var(--card2);border-radius:99px;overflow:hidden}
+.gtimer i{display:block;height:100%;background:var(--accent);transition:width .2s linear}
+.gtimer.low i{background:#9b3b2e}
+.gmeta{display:flex;justify-content:space-between;align-items:center;color:var(--soft);font-size:.85rem}
+.gcard{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:18px}
+.gchan{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:.8rem;color:var(--soft);margin-bottom:10px}
+.gmsg{font-size:1.05rem;line-height:1.55;margin:0}
+.gbtns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gbtn{display:flex;gap:8px;align-items:center;justify-content:center;padding:16px;border-radius:14px;border:2px solid var(--accent);background:transparent;color:var(--ink);font:inherit;font-weight:700;font-size:1rem;cursor:pointer;transition:background .15s}
+.gbtn:hover{background:var(--card2)}
+.gbtn.scam{border-color:#9b3b2e;color:#9b3b2e}.gbtn.legit{border-color:var(--accent);color:var(--accent)}
+.gbtn kbd{font:inherit;font-size:.7rem;opacity:.7;border:1px solid currentColor;border-radius:6px;padding:0 5px}
+.gverdict{border-radius:14px;padding:14px 16px;font-weight:700;display:flex;gap:8px;align-items:center}
+.gverdict.ok{background:#4A564033;border-left:6px solid var(--accent)}.gverdict.bad{background:#9b3b2e22;border-left:6px solid #9b3b2e}
+.gverdict small{font-weight:400;color:var(--soft);margin-left:auto}
+.gexp h3{margin:12px 0 4px}.gexp ul{margin:0;padding-left:1.2rem}.gexp li{margin:2px 0}
+.gtip{background:var(--card2);border-radius:12px;padding:10px 14px;margin-top:10px}
+.gpill{font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid var(--line)}
+.gpill.scam{background:#9b3b2e;border-color:#9b3b2e;color:#F6EBDA}.gpill.legit{background:var(--accent);border-color:var(--accent);color:#F6EBDA}
+.gscore{font-size:2.2rem;font-weight:800;margin:0}
+.ggrid{font-size:1.6rem;letter-spacing:4px;margin:6px 0}
+.gstats{display:flex;gap:24px;flex-wrap:wrap;margin:8px 0}.gstats span{display:block;color:var(--soft);font-size:.8rem}.gstats b{font-size:1.2rem}
+.greview{border-top:1px solid var(--line);padding:14px 0}
+.greview .gmsg{font-size:.95rem}
+@media(max-width:700px){.gbtns{grid-template-columns:1fr}}

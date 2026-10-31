@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import Play from './pages/Play.jsx'
 import AppLayout from "./layouts/AppLayout.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Goals from "./pages/Goals.jsx";
@@ -13,7 +14,7 @@ export default function App() {
         <Route path="/goals" element={<Goals />} />
         <Route path="/simulator" element={<Simulator />} />
         <Route path="/expenses" element={<Expenses />} />
-        <Route path="/news" element={<News />} />
+        <Route path="/news" element={<News />} /><Route path="/play" element={<Play />} />
       </Route>
     </Routes>
   );

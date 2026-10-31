@@ -64,6 +64,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?",
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -538,3 +539,19 @@ async def get_market_news(source: str = "all", limit: int = 30, refresh: bool = 
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="source must be one of: all, rbi, sebi.")
     limit = max(1, min(limit, 100))
     return await news_service.get_news(source, limit, refresh)
+
+
+# ==============================================================================
+# GAME: "Scam or Legit?"
+# ==============================================================================
+
+
+@app.get("/api/game/round", tags=["Game"])
+async def get_game_round(mode: str = "daily"):
+    """Cards for one round of Scam or Legit. mode: daily (same for everyone today) or practice (random)."""
+    import game_service
+
+    try:
+        return game_service.build_round(mode)
+    except ValueError as ve:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))

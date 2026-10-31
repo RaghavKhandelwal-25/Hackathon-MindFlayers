@@ -8,6 +8,7 @@ import {
   TrendingUp,
   Receipt,
   Newspaper,
+  Gamepad2,
 } from "lucide-react";
 import { useFinance } from "../context/FinanceContext";
 import ProfileModal from "../components/ProfileModal";
@@ -53,6 +54,10 @@ export default function AppLayout() {
         <NavLink to="/news" className="nav">
           <Newspaper size={18} />
           <span>News</span>
+        </NavLink>
+        <NavLink to="/play" className="nav">
+          <Gamepad2 size={18} />
+          <span>Play</span>
         </NavLink>
       </nav>
       <main className="main">
