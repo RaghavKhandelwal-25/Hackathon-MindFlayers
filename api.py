@@ -518,3 +518,23 @@ async def delete_user_expense(expense_id: str):
     if not storage.delete_expense(expense_id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Expense '{expense_id}' not found.")
     return {"status": "deleted", "id": expense_id}
+
+
+# ==============================================================================
+# NEWS (live RBI and SEBI feeds)
+# ==============================================================================
+
+
+@app.get("/api/news", tags=["News"])
+async def get_market_news(source: str = "all", limit: int = 30, refresh: bool = False):
+    """Latest RBI and SEBI updates from their official RSS feeds (cached ~30 minutes).
+
+    source: all | rbi | sebi. refresh=true asks for a fresh copy (rate limited to once a minute per source).
+    """
+    import news_service
+
+    source = source.lower()
+    if source != "all" and source not in news_service.SOURCES:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="source must be one of: all, rbi, sebi.")
+    limit = max(1, min(limit, 100))
+    return await news_service.get_news(source, limit, refresh)
