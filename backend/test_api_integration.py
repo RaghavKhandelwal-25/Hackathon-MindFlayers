@@ -1,4 +1,4 @@
-"""Integration tests for FinGuide FastAPI endpoints.
+"""Integration tests for Finbot FastAPI endpoints.
 
 Tests:
 1. GET /api/health returns index stats and model configuration.

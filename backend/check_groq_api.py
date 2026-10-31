@@ -24,7 +24,7 @@ api_key = os.getenv("GROQ_API_KEY", "")
 configured_model = os.getenv("GROQ_MODEL", "")
 
 print("=" * 60)
-print("FinGuide Groq API Diagnostic Check")
+print("Finbot Groq API Diagnostic Check")
 print("=" * 60)
 
 # Check API key presence without printing the value

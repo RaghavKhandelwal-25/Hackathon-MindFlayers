@@ -1,4 +1,4 @@
-"""SQLite Persistence Layer for FinGuide.
+"""SQLite Persistence Layer for Finbot.
 
 Provides local, persistent, thread-safe SQLite storage for:
 1. User Profile (Income, Expenses, Budget, Experience, Goals)

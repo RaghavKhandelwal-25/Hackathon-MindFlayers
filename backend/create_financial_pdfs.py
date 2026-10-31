@@ -1,6 +1,6 @@
 """Utility script to generate authentic financial education PDF documents
 
-for FinGuide local knowledge base testing and demonstration.
+for Finbot local knowledge base testing and demonstration.
 """
 
 from pathlib import Path
@@ -71,7 +71,7 @@ def create_personal_finance_pdf():
     rect3 = fitz.Rect(50, 50, 545, 790)
     page3.insert_textbox(rect3, text_page3, fontsize=11, fontname="helv", align=fitz.TEXT_ALIGN_LEFT)
 
-    doc.set_metadata({"title": "Personal Finance and Budgeting Mastery", "author": "FinGuide Educational Series"})
+    doc.set_metadata({"title": "Personal Finance and Budgeting Mastery", "author": "Finbot Educational Series"})
     doc.save(str(pdf_path))
     doc.close()
     print(f"Created: {pdf_path}")
@@ -132,7 +132,7 @@ def create_investing_fundamentals_pdf():
     rect3 = fitz.Rect(50, 50, 545, 790)
     page3.insert_textbox(rect3, text_page3, fontsize=11, fontname="helv", align=fitz.TEXT_ALIGN_LEFT)
 
-    doc.set_metadata({"title": "Fundamentals of Investing and Asset Classes", "author": "FinGuide Educational Series"})
+    doc.set_metadata({"title": "Fundamentals of Investing and Asset Classes", "author": "Finbot Educational Series"})
     doc.save(str(pdf_path))
     doc.close()
     print(f"Created: {pdf_path}")
@@ -176,7 +176,7 @@ def create_retirement_accounts_pdf():
     rect2 = fitz.Rect(50, 50, 545, 790)
     page2.insert_textbox(rect2, text_page2, fontsize=11, fontname="helv", align=fitz.TEXT_ALIGN_LEFT)
 
-    doc.set_metadata({"title": "Retirement and Tax-Advantaged Accounts", "author": "FinGuide Educational Series"})
+    doc.set_metadata({"title": "Retirement and Tax-Advantaged Accounts", "author": "Finbot Educational Series"})
     doc.save(str(pdf_path))
     doc.close()
     print(f"Created: {pdf_path}")

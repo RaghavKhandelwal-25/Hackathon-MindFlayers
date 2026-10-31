@@ -1,4 +1,4 @@
-"""Generalized Multi-Category Evaluation Suite for FinGuide RAG Assistant.
+"""Generalized Multi-Category Evaluation Suite for Finbot RAG Assistant.
 
 Evaluates the 12 core reasoning and retrieval categories specified in the architecture upgrade:
 1. Direct factual questions

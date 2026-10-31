@@ -1,6 +1,6 @@
-"""FastAPI backend integration for FinGuide RAG pipeline.
+"""FastAPI backend integration for Finbot RAG pipeline.
 
-Exposes RESTful endpoints for the React frontend (fincoach) and any external clients:
+Exposes RESTful endpoints for the React frontend (frontend/) and any external clients:
 - GET /api/health: Pipeline, FAISS index, and model readiness status.
 - POST /api/chat: Full RAG conversational query answering with dual-source citations (PDF and official web).
 """
@@ -45,12 +45,12 @@ except ImportError:
 
 # Create FastAPI app
 app = FastAPI(
-    title="FinGuide RAG API",
+    title="Finbot RAG API",
     description="Evidence-grounded financial education RAG API with dual-source citations and functional goal planning.",
     version="1.0.0",
 )
 
-# Configure CORS to allow Raghav's React frontend
+# Configure CORS for the Finbot React frontend
 ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
@@ -59,6 +59,10 @@ ALLOWED_ORIGINS = [
     "http://localhost:4173",
     "http://127.0.0.1:4173",
 ]
+
+# Production: set CORS_ORIGINS (comma-separated) to your deployed frontend URL(s),
+# e.g. CORS_ORIGINS=https://finbot.vercel.app
+ALLOWED_ORIGINS += [o.strip().rstrip("/") for o in os.getenv("CORS_ORIGINS", "").split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
@@ -77,7 +81,7 @@ def get_pipeline() -> RAGPipeline:
     """Return the cached RAG pipeline singleton, initializing if needed."""
     global _pipeline
     if _pipeline is None:
-        logger.info("Initializing global FinGuide RAGPipeline...")
+        logger.info("Initializing global Finbot RAGPipeline...")
         _pipeline = RAGPipeline()
     return _pipeline
 
@@ -203,13 +207,13 @@ class ExpensePayload(BaseModel):
 @app.on_event("startup")
 async def startup_event():
     """Log server startup readiness."""
-    logger.info("FinGuide FastAPI service ready.")
+    logger.info("Finbot FastAPI service ready.")
 
 
 @app.get("/", tags=["General"])
 async def root():
     return {
-        "message": "FinGuide Financial Education RAG API is running.",
+        "message": "Finbot Financial Education RAG API is running.",
         "docs_url": "/docs",
         "health_url": "/api/health",
     }
@@ -232,7 +236,7 @@ async def health_check():
 
 @app.post("/api/chat", response_model=ChatResponse, tags=["Chat"])
 async def chat_endpoint(request: ChatRequest):
-    """Process a user query through the FinGuide RAG pipeline and return grounded response and citations."""
+    """Process a user query through the Finbot RAG pipeline and return grounded response and citations."""
     user_query = request.message.strip()
     if not user_query:
         raise HTTPException(

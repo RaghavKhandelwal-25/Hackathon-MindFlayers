@@ -1,4 +1,4 @@
-"""Comprehensive Test Suite for FinGuide RAG Chatbot.
+"""Comprehensive Test Suite for Finbot RAG Chatbot.
 
 Validates:
 1. PDF extraction & chunking.
@@ -367,7 +367,7 @@ class TestHybridRetrievalAndOfficialSources(unittest.TestCase):
         self.assertEqual(result.intent, IntentType.GREETING.value)
         self.assertEqual(len(result.sources), 0)
         self.assertEqual(len(result.web_sources), 0)
-        self.assertIn("FinGuide", result.answer)
+        self.assertIn("Finbot", result.answer)
 
     def test_scenario_2_misspelled_financial_query(self):
         """2. A misspelled financial query."""

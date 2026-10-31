@@ -1,4 +1,4 @@
-"""FinGuide RAG (Retrieval-Augmented Generation) Pipeline.
+"""Finbot RAG (Retrieval-Augmented Generation) Pipeline.
 
 Handles query embedding, FAISS similarity search, multi-query facet decomposition,
 reciprocal rank fusion, curated official web knowledge retrieval (RBI, SEBI, NCFE),
@@ -17,7 +17,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 import dotenv
 import numpy as np
 
-# Load environment variables explicitly from finguide/.env if present
+# Load environment variables explicitly from backend/.env if present
 BASE_DIR = Path(__file__).resolve().parent
 ENV_PATH = BASE_DIR / ".env"
 if ENV_PATH.exists():
@@ -69,7 +69,7 @@ DEFAULT_GROQ_MODEL = "openai/gpt-oss-120b"
 DEFAULT_TOP_K = 4
 DEFAULT_SIMILARITY_THRESHOLD = 0.35
 
-SYSTEM_PROMPT = """You are FinGuide, an intelligent, approachable, and highly reliable AI assistant dedicated exclusively to financial education based on verified local PDF documents and official Indian financial regulator/educational portals (RBI, SEBI, NCFE).
+SYSTEM_PROMPT = """You are Finbot, an intelligent, approachable, and highly reliable AI assistant dedicated exclusively to financial education based on verified local PDF documents and official Indian financial regulator/educational portals (RBI, SEBI, NCFE).
 
 YOUR GUIDELINES & CORE RESPONSIBILITIES:
 1. CLEAR, BEGINNER-FRIENDLY & DIRECT: Answer financial questions in plain, accessible language. State the direct answer to the core question in your opening sentences before providing supporting detail or structured breakdowns.

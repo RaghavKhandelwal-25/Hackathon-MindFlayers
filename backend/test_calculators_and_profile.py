@@ -253,7 +253,7 @@ class TestQueryRoutingAndCalculators(unittest.TestCase):
 
     def test_greeting_routing(self):
         res = self.pipeline.query("Hello! Good morning.")
-        self.assertIn("Hello! Welcome to FinGuide", res.answer)
+        self.assertIn("Hello! Welcome to Finbot", res.answer)
         self.assertFalse(res.sources)
 
     def test_profile_query_routing(self):

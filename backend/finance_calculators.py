@@ -1,4 +1,4 @@
-"""Deterministic Financial Calculation Module for FinGuide.
+"""Deterministic Financial Calculation Module for Finbot.
 
 Provides standalone, deterministic, mathematically rigorous functions for:
 1. Budget & Cashflow analysis (Income, Expenses, Outflows, 50/30/20 comparison).
